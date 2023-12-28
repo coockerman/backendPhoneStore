@@ -14,6 +14,5 @@ public class NhaCungCap {
     private String ten;
     private String sdt;
     private String address;
-
 }
 

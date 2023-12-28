@@ -5,6 +5,9 @@ import com.example.phoneStore.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.Optional;
+
 @Service
 public class UserService {
     private final UserRepository userRepository;
@@ -17,8 +20,6 @@ public class UserService {
         if (!existsByUsername(user.getUserName())) {
             userRepository.save(user);
         } else {
-            // Người dùng đã tồn tại, bạn có thể xử lý tùy ý, ví dụ: throw exception hoặc trả về thông báo lỗi.
-            // Ở đây, tôi sẽ trả về một Exception.
             throw new RuntimeException("Username already exists");
         }
     }
@@ -26,9 +27,47 @@ public class UserService {
     public boolean existsByUsername(String username) {
         return userRepository.existsByUserName(username);
     }
-    public boolean authenticateUser(String username, String password) {
+    public String authenticateUser(String username, String password) {
+        System.out.println(username);
         User user = userRepository.findUserByUserName(username);
+        if(user != null && user.getPassword().equals(password)) {
+            System.out.println(user.getChucVu());
 
-        return user != null && user.getPassword().equals(password);
+            if(user.getChucVu()==null) return "false";
+            System.out.println("pem");
+
+            if(user.getChucVu().equals("QuanLy")) {
+                return "QuanLy";
+            }else{
+                return "NhanVien";
+            }
+        }
+        return "false";
+    }
+
+    public List<User> getAllUsers() {
+        return userRepository.findAll();
+    }
+
+    public Optional<User> updateUser(String id, User updatedUser) {
+        return userRepository.findById(id)
+                .map(existingUser -> {
+                    existingUser.setUserName(updatedUser.getUserName());
+                    existingUser.setPassword(updatedUser.getPassword());
+                    existingUser.setTen(updatedUser.getTen());
+                    existingUser.setDiaChi(updatedUser.getDiaChi());
+                    existingUser.setSdt(updatedUser.getSdt());
+                    existingUser.setChucVu(updatedUser.getChucVu());
+                    existingUser.setGioiTinh(updatedUser.getGioiTinh());
+                    return userRepository.save(existingUser);
+                });
+    }
+
+    public void deleteUser(String id) {
+        userRepository.deleteById(id);
+    }
+
+    public User getUserById(String id) {
+        return userRepository.findById(id).get();
     }
 }
