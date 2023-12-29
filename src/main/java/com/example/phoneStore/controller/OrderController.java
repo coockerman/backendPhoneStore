@@ -1,11 +1,11 @@
 package com.example.phoneStore.controller;
 
 import com.example.phoneStore.entity.Order;
-import com.example.phoneStore.entity.Phone;
 import com.example.phoneStore.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -16,6 +16,8 @@ public class OrderController {
 
     @PostMapping(value="save")
     public Order submitOrder(@RequestBody Order order) {
+        // Thêm thời gian hiện tại khi tạo đối tượng Order
+        order.setOrderTime(LocalDateTime.now());
         return orderService.saveOrder(order);
     }
 

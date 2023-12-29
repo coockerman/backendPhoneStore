@@ -5,6 +5,7 @@ import com.example.phoneStore.service.PhoneService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -25,15 +26,37 @@ public class PhoneController {
 
     @PostMapping(value="/save")
     private String savPhone(@RequestBody Phone phone) {
+        // Khởi tạo thời gian hiện tại
+        LocalDateTime currentTime = LocalDateTime.now();
+
+        // Gán thời gian hiện tại vào thuộc tính purchaseTime
+        phone.setPurchaseTime(currentTime);
+
+        // Lưu vào cơ sở dữ liệu
         phoneService.saveOrUpdate(phone);
+
         return phone.get_id();
     }
 
     @PutMapping(value="/edit/{id}")
-    private Phone update(@RequestBody Phone phone, @PathVariable(name="id")String _id) {
-        phone.set_id(_id);
-        phoneService.saveOrUpdate(phone);
-        return phone;
+    private Phone update(@RequestBody Phone updatedPhone, @PathVariable(name="id")String _id) {
+        // Lấy ra đối tượng cần cập nhật từ cơ sở dữ liệu
+        Phone existingPhone = phoneService.getPhoneById(_id);
+
+        // Kiểm tra nếu đối tượng tồn tại
+        if (existingPhone != null) {
+            // Cập nhật các trường, trừ trường thời gian
+            existingPhone.setPhoneName(updatedPhone.getPhoneName());
+            existingPhone.setPhoneType(updatedPhone.getPhoneType());
+            existingPhone.setPhoneColor(updatedPhone.getPhoneColor());
+            existingPhone.setNcc(updatedPhone.getNcc());
+            existingPhone.setPhonePrice(updatedPhone.getPhonePrice());
+
+            // Lưu đối tượng đã cập nhật vào cơ sở dữ liệu
+            phoneService.saveOrUpdate(existingPhone);
+        }
+
+        return existingPhone;
     }
 
     @DeleteMapping(value="/delete/{id}")

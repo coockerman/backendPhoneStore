@@ -31,4 +31,8 @@ public class PhoneService {
     public List<Phone> findPhonesByName(String name) {
         return phoneRepository.findByPhoneNameLikeIgnoreCase(name);
     }
+
+    public Phone getPhoneById(String id) {
+        return phoneRepository.findById(id).get();
+    }
 }
